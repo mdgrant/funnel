@@ -1,7 +1,10 @@
-# 2015-02-27 heart transplant
+# 2015-02-27 heart transplant funnel plot adults 30d mortality
 
 
 ## code: download data, select variables for analysis ####
+# check if _data directory exists, create if needed
+if (!file.exists("_data")) {dir.create("_data")}
+
 # download and read data
 fileUrl <- "http://www.srtr.org/csr/archives/201406/csrs_final_tables201406HR.zip"
 download.file(fileUrl, destfile="_data/heartTables.zip", method="curl")
@@ -40,13 +43,25 @@ hrtAd <- hrtAd[hrtAd$ad_n_c1m > 2, ]
 # calculate bounds, "Exact" 95% Confidence Intervals,  (qchisq(α/2, 2*x)/2, qchisq(1-α/2, 2*(x+1))/2 )
 # Ulm K. A simple method to calculate the confidence interval of a standardized mortality ratio. American Journal of Epidemiology 1990;131(2):373-375.
 
-# lower limits
+# lower limits as %
 low2alpha <- -(1 - qchisq(0.025, 2*(c(1:10)))/2/c(1:10))*100
 low3alpha <- -(1 - qchisq(0.001, 2*(c(1:10)))/2/c(1:10))*100
 
-# upper limits
-up2alpha <- (qchisq(0.975, 2*(c(1:10)+1))/2/c(1:10) - 1) * 100
-up3alpha <- (qchisq(0.999, 2*(c(1:10)+1))/2/c(1:10) - 1) * 100
+# upper limits as %
+up2alpha <- (qchisq(0.975, 2*(c(1:10)+1))/2/c(1:10) - 1)*100
+up3alpha <- (qchisq(0.999, 2*(c(1:10)+1))/2/c(1:10) - 1)*100
+
+# lower limits SMRs
+low2smr <- low2alpha/100 + 1
+low3smr <- low3alpha/100 + 1
+
+# upper limits SMRS
+up2smr <- up2alpha/100 + 1
+up3smr <- up3alpha/100 + 1
+
+limits <- data.frame(c(1:10), low2alpha, low3alpha, up2alpha, up3alpha, low2smr, low3smr, up2smr, up3smr)
+names(limits)[1] <- "events"
+limits <- limits[limits$events < 9,]
 
 # calculate proportionate increase SMR
 hrtAd$ests <- with(hrtAd, (ad_obs_c1m - ad_exp_c1m)/ad_exp_c1m * 100 )
@@ -55,7 +70,20 @@ hrtAd$ests <- with(hrtAd, (ad_obs_c1m - ad_exp_c1m)/ad_exp_c1m * 100 )
 
 
 ## code: create plot ####
+library(ggplot2)
+library(scales)  
 
+adult30d <- ggplot(data=hrtAd, aes(x=ad_exp_c1m, y=ad_smr_c1m)) +
+    geom_point(origin=0)  +
+    labs(x = "Expected Deaths", y = "SMR") +
+    stat_smooth(data=limits, aes(events, low2smr), size=1, method="loess", se = FALSE) +
+    stat_smooth(data=limits, aes(events, low3smr), size=1, method="loess", se = FALSE, colour="red") +
+    stat_smooth(data=limits, aes(events, up2smr), size=1, method="loess", se = FALSE) +
+    stat_smooth(data=limits, aes(events, up3smr), size=1, method="loess", se = FALSE, colour="red") + 
+    scale_y_continuous(trans=sqrt_trans(), breaks=c(0:10), limits=c(0,10)) +
+    geom_hline(yintercept = 1.0)
+    
+ggsave("adult30d.pdf", width=5, height=5)
 
 # * (end)
 
