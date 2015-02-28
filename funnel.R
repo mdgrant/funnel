@@ -78,8 +78,8 @@ adult30d <- ggplot(data=hrtAd, aes(x=ad_exp_c1m, y=ad_smr_c1m)) +
     labs(x = "Expected Deaths", y = "SMR") +
     stat_smooth(data=limits, aes(events, low2smr), size=1, method="loess", se = FALSE) +
     stat_smooth(data=limits, aes(events, low3smr), size=1, method="loess", se = FALSE, colour="red") +
-    stat_smooth(data=limits, aes(events, up2smr), size=1, method="loess", se = FALSE) +
-    stat_smooth(data=limits, aes(events, up3smr), size=1, method="loess", se = FALSE, colour="red") + 
+    stat_smooth(data=limits, aes(events, up2smr),  size=1, method="loess", se = FALSE) +
+    stat_smooth(data=limits, aes(events, up3smr),  size=1, method="loess", se = FALSE, colour="red") + 
     scale_y_continuous(trans=sqrt_trans(), breaks=c(0:10), limits=c(0,10)) +
     geom_hline(yintercept = 1.0)
     
