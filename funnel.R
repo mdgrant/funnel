@@ -149,12 +149,12 @@ hrtAd$newUp <- with(hrtAd, ifelse(ad_smrucl_c1y>10, 10, ad_smrucl_c1y))
 
 ggplot(data=hrtAd[hrtAd$ad_smr_c1y < 7, ], aes(x=ad_smr_c1y, y=newLab)) +
     geom_point() +
-    geom_errorbarh(aes(xmin=ad_smrlcl_c1y, xmax=newUp),height=0.1, size=.35) +
+    geom_errorbarh(aes(xmin=ad_smrlcl_c1y, xmax=newUp), height=0.1, size=.35) +
     geom_vline(xintercept = 1) +
     scale_x_continuous(limits=c(0, 10), breaks=c(0:10)) +
-    labs(x = "SMR, 95% CI (truncated at limit of 10)", size=5, y = "Center") +
-    theme(axis.text.y = element_text(size = 7)) + theme_bw()
+    labs(x = "SMR, 95% CI (truncated at limit of 10)", size=.5, y = "Center") +
+    theme(axis.text.y = element_text(size = 7)) 
 
-ggsave("adult1yCis.pdf", width=5, height=5)
+ggsave("adult1yCis.pdf", width=5, height=10)
 
 # * (end)
