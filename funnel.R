@@ -93,6 +93,8 @@ adult30d <- ggplot(data=hrtAd, aes(x=ad_exp_c1m, y=ad_smr_c1m)) +
     stat_smooth(data=limits, aes(events, up3smr),  size=1, method="loess", se = FALSE, colour="red") + 
     scale_y_continuous(trans=sqrt_trans(), breaks=c(0:10), limits=c(0,10)) +
     geom_hline(yintercept = 1.0)
+
+adult30d
     
 ggsave("adult30d.pdf", width=5, height=5)
 
@@ -125,7 +127,7 @@ dev.off()
 adult1yBase <- function(){
     par(bty="n")
     with(hrtAd, plot(ad_exp_c1y, sqrt(ad_smr_c1y), yaxt="n", ylab="SMR", xlab="Expected Deaths at 1 Year", ylim=c(0, sqrt(8))))
-    axis(side=2, at=sapply(c(0:8), FUfunction(x) sqrt(x)), labels=c(0:8)) 
+    axis(side=2, at=sapply(c(0:8), function(x) sqrt(x)), labels=c(0:8)) 
     with(limits, xspline(events, sqrt(low2smr), shape=1, lty=2))
     with(limits, xspline(events, sqrt(low3smr), shape=1, lty=3))
     with(limits, xspline(events, sqrt(up2smr),  shape=1, lty=2))
@@ -135,7 +137,7 @@ adult1yBase <- function(){
 
 adult1yBase()
 
-pdf("adult1ydBase.pdf", width=5, height=5)
+pdf("adult1ydBase.pdf", width=7, height=7)
 adult1yBase()
 dev.off()
 
