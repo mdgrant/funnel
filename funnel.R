@@ -53,7 +53,7 @@ hrtAd <- hrtAd[!is.na(hrtAd$ad_smr_c1y),]
 # Ulm K. A simple method to calculate the confidence interval of a standardized mortality ratio. 
 # American Journal of Epidemiology 1990;131(2):373-375.
 
-xAxis <- c(1:15)
+xAxis <- c(1:20)
 # lower limits as %
 low2alpha <- -(1 - qchisq(0.025, 2*(xAxis))/2/xAxis)*100
 low3alpha <- -(1 - qchisq(0.001, 2*(xAxis))/2/xAxis)*100
@@ -80,27 +80,6 @@ hrtAd$ests <- with(hrtAd, (ad_obs_c1m - ad_exp_c1m)/ad_exp_c1m * 100 )
 # * (end)
 
 
-## code: create plot ggplot ####
-library(ggplot2)
-library(scales)  
-
-adult30d <- ggplot(data=hrtAd, aes(x=ad_exp_c1m, y=ad_smr_c1m)) +
-    geom_point(origin=0)  +
-    labs(x = "Expected Deaths at 30 Days", y = "SMR") +
-    stat_smooth(data=limits, aes(events, low2smr), size=1, method="loess", se = FALSE) +
-    stat_smooth(data=limits, aes(events, low3smr), size=1, method="loess", se = FALSE, colour="red") +
-    stat_smooth(data=limits, aes(events, up2smr),  size=1, method="loess", se = FALSE) +
-    stat_smooth(data=limits, aes(events, up3smr),  size=1, method="loess", se = FALSE, colour="red") + 
-    scale_y_continuous(trans=sqrt_trans(), breaks=c(0:10), limits=c(0,10)) +
-    geom_hline(yintercept = 1.0)
-
-adult30d
-    
-ggsave("adult30d.pdf", width=5, height=5)
-
-# * (end)
-
-
 ## code: create plot base graphics 30d ####
 
 adult30dBase <- function(){
@@ -112,11 +91,13 @@ adult30dBase <- function(){
     with(limits, xspline(events, sqrt(up2smr),  shape=1, lty=2))
     with(limits, xspline(events, sqrt(up3smr),  shape=1, lty=3))
     abline(1, 0, col="gray")
+    text(8, 1.7, "99.8% limit", cex=.7)
+    text(7.95, 1.47, "95% limit", cex=.7)
 }
 
 adult30dBase()
 
-pdf("adult30dBase.pdf", width=5, height=5)
+pdf("adult30dBase.pdf", width=7.5, height=7.55)
 adult30dBase()
 dev.off()
 
@@ -124,20 +105,23 @@ dev.off()
 
 
 ## code: create plot base graphics 1y ####
+
 adult1yBase <- function(){
     par(bty="n")
-    with(hrtAd, plot(ad_exp_c1y, sqrt(ad_smr_c1y), yaxt="n", ylab="SMR", xlab="Expected Deaths at 1 Year", ylim=c(0, sqrt(8))))
+    with(hrtAd, plot(ad_exp_c1y, sqrt(ad_smr_c1y), yaxt="n", ylab="SMR", xlab="Expected Deaths at 1 Year", xlim=c(0,20), ylim=c(0, sqrt(8))))
     axis(side=2, at=sapply(c(0:8), function(x) sqrt(x)), labels=c(0:8)) 
     with(limits, xspline(events, sqrt(low2smr), shape=1, lty=2))
     with(limits, xspline(events, sqrt(low3smr), shape=1, lty=3))
     with(limits, xspline(events, sqrt(up2smr),  shape=1, lty=2))
     with(limits, xspline(events, sqrt(up3smr),  shape=1, lty=3))
     abline(1, 0, col="gray")
+    text(18, 1.45, "99.8% limit", cex=.7)
+    text(17.8, 1.3,  "95% limit", cex=.7)
 }
 
 adult1yBase()
 
-pdf("adult1ydBase.pdf", width=7, height=7)
+pdf("adult1ydBase.pdf", width=7.5, height=7.5)
 adult1yBase()
 dev.off()
 
@@ -160,3 +144,24 @@ ggplot(data=hrtAd[hrtAd$ad_smr_c1y < 7, ], aes(x=ad_smr_c1y, y=newLab)) +
 ggsave("adult1yCis.pdf", width=5, height=10)
 
 # * (end)
+
+
+## code: create plot ggplot ####
+# library(ggplot2)
+# library(scales)  
+# 
+# adult30d <- ggplot(data=hrtAd, aes(x=ad_exp_c1m, y=ad_smr_c1m)) +
+#     geom_point(origin=0)  +
+#     labs(x = "Expected Deaths at 30 Days", y = "SMR") +
+#     stat_smooth(data=limits, aes(events, low2smr), size=1, method="loess", se = FALSE) +
+#     stat_smooth(data=limits, aes(events, low3smr), size=1, method="loess", se = FALSE, colour="red") +
+#     stat_smooth(data=limits, aes(events, up2smr),  size=1, method="loess", se = FALSE) +
+#     stat_smooth(data=limits, aes(events, up3smr),  size=1, method="loess", se = FALSE, colour="red") + 
+#     scale_y_continuous(trans=sqrt_trans(), breaks=c(0:10), limits=c(0,10)) +
+#     geom_hline(yintercept = 1.0)
+# 
+# adult30d
+# 
+# ggsave("adult30d.pdf", width=5, height=5)
+# * (end)
+
